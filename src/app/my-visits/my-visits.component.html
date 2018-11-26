@@ -1,0 +1,9 @@
+<div *ngIf="dataExists">
+    <canvas baseChart
+    [data]="pieChartData"
+    [labels]="pieChartLabels"
+    [chartType]="pieChartType"></canvas>
+</div>
+
+<button (click)="showSum($event)"> Suma </button>
+<button (click)="showCount($event)"> Apsilankymų skaičius </button>
