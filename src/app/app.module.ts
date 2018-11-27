@@ -9,6 +9,9 @@ import { MyRadarChartComponent } from './my-radar-chart/my-radar-chart.component
 import { MyPieChartComponent } from './my-pie-chart/my-pie-chart.component';
 import { HttpClientModule } from '@angular/common/http';
 import { MyVisitsComponent } from './my-visits/my-visits.component';
+import { VisitLineChartComponent } from './visit-line-chart/visit-line-chart.component';
+import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
+
 
 const routes: Routes = [
   {path: 'bar-chart', component: MyBarChartComponent},
@@ -16,6 +19,7 @@ const routes: Routes = [
   {path: 'radar-chart', component: MyRadarChartComponent},
   {path: 'pie-chart', component: MyPieChartComponent},
   {path: 'visits', component: MyVisitsComponent},
+  {path : 'line-chart', component: VisitLineChartComponent},
   {path: '**', component: MyBarChartComponent }
 ];
 
@@ -26,12 +30,14 @@ const routes: Routes = [
     MyDoughnutChartComponent,
     MyRadarChartComponent,
     MyPieChartComponent,
-    MyVisitsComponent
+    MyVisitsComponent,
+    VisitLineChartComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     RouterModule.forRoot(routes),
+    Ng4LoadingSpinnerModule.forRoot(),
     ChartsModule
   ],
   providers: [],

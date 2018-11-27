@@ -1,0 +1,12 @@
+<div *ngIf="dataExists">
+  <canvas baseChart
+  [data]="lineChartData"
+  [labels]="lineChartLabels"
+  [options] = "lineChartOptions"
+  [chartType]="lineChartType"></canvas>
+</div>
+
+<button (click)="showSum($event)"> Suma </button>
+<button (click)="showCount($event)"> Apsilankymų skaičius </button>
+
+
