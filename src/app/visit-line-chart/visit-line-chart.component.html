@@ -1,6 +1,6 @@
 <div *ngIf="dataExists">
   <canvas baseChart
-  [data]="lineChartData"
+  [datasets] = "lineChartDataSet"
   [labels]="lineChartLabels"
   [options] = "lineChartOptions"
   [chartType]="lineChartType"></canvas>

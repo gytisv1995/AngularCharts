@@ -12,22 +12,21 @@ import Chart from '../../../node_modules/chart.js';
 export class VisitLineChartComponent implements OnInit {
 
   visits:any = [];
-  lineChartLegend : string = "Sum";
+  ageFilters: any = [{fromAge: 18, toAge:30 }, {fromAge:0, toAge:0}];
    dataExists: boolean = false; 
    type : string = "";
    lineChartLabels = [];
    sums:any = [];
    lineChartData = [];
+   lineChartDataSet=[];
    lineChartType = 'line';
    myLineChart={};
    public lineChartOptions:any = {
     responsive: true,
     legend: {
       display: true,
-      position: 'bottom',
-      label: "Suma"
+      position: 'top',
     },
-    label: "Sum"
   };
   constructor(public rest:RestService, private spinnerService: Ng4LoadingSpinnerService) {}
 
@@ -36,18 +35,19 @@ export class VisitLineChartComponent implements OnInit {
   ngOnInit() {
     this.getVisits();
   }
-
+ 
+ birthdayToAge(date:string) {
+    let birthday= new Date(date);
+    let ageDifMs = Date.now() - birthday.getTime();
+    let ageDate = new Date(ageDifMs); // miliseconds from epoch
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+  }
   resetValues()
   {
-    this.lineChartData= [];
-    this.lineChartLabels=[];
-    this.sums=[];
-    console.log(this.lineChartData);
-  }
-
-  changeLabel(event: any)
-  {
-    this.lineChartLabels[3]="Changed";
+    this.lineChartData.length = 0;
+    this.lineChartLabels.length=0;
+    this.lineChartDataSet.length=0;
+    this.sums.length=0;
   }
 
   getVisits(): any 
@@ -55,9 +55,9 @@ export class VisitLineChartComponent implements OnInit {
   
   this.dataExists=false;
   this.spinnerService.show();
-    this.rest.getVisits("sKWnIFQ3HeWzZW5Z2M0C49b6CWj2","-LMlWQeB6J0MY-tDOoeI","","2018-10-25","2018-11-26","","","","").subscribe((data: {data}) => {
-      this.visits = data.data;
-      this.calculate(event,"sum");
+  this.rest.getVisits("sKWnIFQ3HeWzZW5Z2M0C49b6CWj2","-LMlWQeB6J0MY-tDOoeI","","","","","","","").subscribe((data: {data}) => {
+    this.visits = data.data;
+      this.calculate(event,"suma");
 
     });
 }
@@ -66,12 +66,28 @@ calculate(event: any, type:string )
 {
   
   this.resetValues();
+  this.dataExists=false;
   this.spinnerService.show();
 for (let visit of this.visits) 
+{
+let ageCorrect=false;  
+  visit.userData.age= this.birthdayToAge(visit.userData.birthDate)
+  
+      for (let ageFilter of this.ageFilters)
+    {
+        if(visit.userData.age>=ageFilter.fromAge && visit.userData.age<=ageFilter.toAge)
+        {
+        ageCorrect=true;
+        break;
+        }
+    }
+      
+    if(ageCorrect)
     {
       let date = formatDate(visit.dateTime,"yyyy-MM-dd","en-US")
       if(!this.lineChartLabels.includes(date))
       {
+
       this.lineChartLabels.push(date);
       this.sums.push({date:date,spentSum:visit.spentSum,visitsCount:1})
      }
@@ -83,30 +99,34 @@ for (let visit of this.visits)
         visitsCount:this.sums[index].visitsCount+1 }
      }
 
-     }  
+    }
+  
+}  
     // this.sums=this.sums.filter((o) => o.date!=undefined);
      this.sums.sort((a, b) => a.date.localeCompare(b.date));
      this.lineChartLabels=this.sums.map(obj=> obj.date);
      if(type=="sum")
      {
-     this.lineChartData=this.sums.map(obj=>obj.spentSum);
+     this.lineChartData=this.sums.map(obj=>parseFloat(obj.spentSum.toFixed(2)));
+     this.lineChartDataSet.push({data:this.lineChartData,label: 'Sum'});
      }
      else
      {
       this.lineChartData=this.sums.map(obj=>obj.visitsCount);
+      this.lineChartDataSet.push({data:this.lineChartData,label: 'Count'});
+      console.log("Count");
      }
       this.dataExists=true;
       this.spinnerService.hide();
-      console.log(this.lineChartData);
+      console.log(this.lineChartDataSet);
+      
    }
 
 
 showSum(event: any)
   {
     this.spinnerService.show();
-    this.calculate(event,"sum");
-      
-      this.dataExists=true;
+    this.calculate(event,"sum");    
       this.spinnerService.hide();
 
   }
